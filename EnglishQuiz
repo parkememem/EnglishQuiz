@@ -2,138 +2,126 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>English Quiz</title>
+  <title>English Word Quiz</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       text-align: center;
       padding: 40px;
-      background: #f9f9f9;
-    }
-    h1 {
-      margin-bottom: 20px;
+      background: #f4f4f4;
     }
     #quiz-box {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       display: inline-block;
-      min-width: 400px;
+      min-width: 300px;
     }
     #question {
-      font-size: 20px;
-      margin-bottom: 15px;
+      font-size: 22px;
+      margin-bottom: 20px;
     }
-    input[type=text] {
-      padding: 10px;
-      font-size: 16px;
-      width: 70%;
+    input {
+      padding: 8px;
+      font-size: 18px;
     }
     button {
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 8px 16px;
       margin-left: 10px;
+      font-size: 16px;
+      cursor: pointer;
     }
     #result {
-      margin-top: 15px;
+      margin-top: 20px;
       font-size: 18px;
-      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>English Quiz</h1>
+  <h1>English Word Quiz</h1>
   <div id="quiz-box">
     <div id="question"></div>
-    <input type="text" id="answer" placeholder="정답 입력">
+    <input type="text" id="answer" autocomplete="off">
     <button onclick="checkAnswer()">확인</button>
     <div id="result"></div>
   </div>
 
   <script>
     const words = [
-      { en: "declare", ko: "선언하다" },
-      { en: "recognition", ko: "알아봄, 인식" },
-      { en: "commitment", ko: "약속, 전념" },
-      { en: "ease", ko: "쉬움, 용이함, 편의성" },
-      { en: "domestic", ko: "국내의" },
-      { en: "tension", ko: "긴장 상태" },
-      { en: "concern", ko: "(사람에게) 영향을 미치다[관련되다], 배려, 염려" },
-      { en: "humanitarian", ko: "인도주의적인" },
-      { en: "crisis", ko: "위기" },
-      { en: "conference", ko: "회의" },
-      { en: "condemned", ko: "비난받은, 유죄 선고를 받은" },
-      { en: "lasting", ko: "영속적인" },
-      { en: "settlement", ko: "합의" },
-      { en: "occupation", ko: "직업" },
-      { en: "absurd", ko: "우스꽝스러운, 터무니없는" },
-      { en: "insist", ko: "고집하다" },
-      { en: "senior", ko: "고위" },
-      { en: "further", ko: "더 멀리에" },
-      { en: "sanction", ko: "제재" },
-      { en: "elected", ko: "선출된" },
-      { en: "criticism", ko: "비판" },
-      { en: "response", ko: "대답, 응답, 회신, 답장" },
-      { en: "expected", ko: "예상되는" },
-      { en: "annual", ko: "매년의" },
-      { en: "prime minister", ko: "수상" },
-      { en: "secure", ko: "안심하는" },
-      { en: "alongside", ko: "옆에, 나란히" },
-      { en: "a viable", ko: "가능한" },
-      { en: "neither", ko: "도 마찬가지이다" },
-      { en: "attempt", ko: "시도, 시도하다" },
-      { en: "brutal", ko: "잔혹한, 악랄한" },
-      { en: "genuine", ko: "진짜의, 진품의" },
-      { en: "exact", ko: "정확한" },
-      { en: "opposite", ko: "다른 편" },
-      { en: "concluded", ko: "결론[판단]을 내리다" },
-      { en: "relentless", ko: "수그러들지 않는" },
-      { en: "increasing", ko: "증대[증가]하는" },
-      { en: "bombardment", ko: "포격" },
-      { en: "offensive", ko: "모욕적인" },
-      { en: "starvation", ko: "기아, 굶주림" },
-      { en: "devastation", ko: "대대적인 파괴" },
-      { en: "utterly", ko: "완전히" },
-      { en: "intolerable", ko: "견딜[참을] 수 없는" },
-      { en: "horrify", ko: "몸서리치게[소름끼치게] 만들다" }
+      {en: "declare", ko: "선언하다"},
+      {en: "recognition", ko: "알아봄, 인식"},
+      {en: "commitment", ko: "약속, 전념"},
+      {en: "ease", ko: "쉬움, 용이함, 편의성"},
+      {en: "domestic", ko: "국내의"},
+      {en: "tension", ko: "긴장 상태"},
+      {en: "concern", ko: "(사람에게) 영향을 미치다[관련되다], 배려, 염려"},
+      {en: "humanitarian", ko: "인도주의적인"},
+      {en: "crisis", ko: "위기"},
+      {en: "conference", ko: "회의"},
+      {en: "condemned", ko: "비난받은, 유죄 선고를 받은"},
+      {en: "lasting", ko: "영속적인"},
+      {en: "settlement", ko: "합의"},
+      {en: "occupation", ko: "직업"},
+      {en: "absurd", ko: "우스꽝스러운, 터무니없는"},
+      {en: "insist", ko: "고집하다"},
+      {en: "senior", ko: "고위"},
+      {en: "further", ko: "더 멀리에"},
+      {en: "sanction", ko: "제재"},
+      {en: "elected", ko: "선출된"},
+      {en: "criticism", ko: "비판"},
+      {en: "response", ko: "대답, 응답, 회신, 답장"},
+      {en: "expected", ko: "예상되는"},
+      {en: "annual", ko: "매년의"},
+      {en: "prime minister", ko: "수상"},
+      {en: "secure", ko: "안심하는"},
+      {en: "alongside", ko: "옆에, 나란히"},
+      {en: "a viable", ko: "가능한"},
+      {en: "neither", ko: "도 마찬가지이다"},
+      {en: "attempt", ko: "시도, 시도하다"},
+      {en: "brutal", ko: "잔혹한, 악랄한"},
+      {en: "genuine", ko: "진짜의, 진품의"},
+      {en: "exact", ko: "정확한"},
+      {en: "opposite", ko: "다른 편"},
+      {en: "concluded", ko: "결론[판단]을 내리다"},
+      {en: "relentless", ko: "수그러들지 않는"},
+      {en: "increasing", ko: "증대[증가]하는"},
+      {en: "bombardment", ko: "포격"},
+      {en: "offensive", ko: "모욕적인"},
+      {en: "starvation", ko: "기아, 굶주림"},
+      {en: "devastation", ko: "대대적인 파괴"},
+      {en: "utterly", ko: "완전히"},
+      {en: "intolerable", ko: "견딜[참을] 수 없는"},
+      {en: "horrify", ko: "몸서리치게[소름끼치게] 만들다"}
     ];
 
-    let currentWord, askEnglish;
+    let currentWord;
+    let showEnglish; // true면 영어→한국어, false면 한국어→영어
 
     function newQuestion() {
       const randomIndex = Math.floor(Math.random() * words.length);
       currentWord = words[randomIndex];
-      askEnglish = Math.random() < 0.5; // true면 영어→한국어, false면 한국어→영어
+      showEnglish = Math.random() < 0.5; // 절반 확률로 방향 전환
 
-      const questionBox = document.getElementById("question");
+      document.getElementById("result").textContent = "";
       document.getElementById("answer").value = "";
-      document.getElementById("result").innerText = "";
 
-      if (askEnglish) {
-        questionBox.innerText = `뜻: ${currentWord.ko}`;
+      if (showEnglish) {
+        document.getElementById("question").textContent = currentWord.en;
       } else {
-        questionBox.innerText = `영어 단어: ${currentWord.en}`;
+        document.getElementById("question").textContent = currentWord.ko;
       }
+      document.getElementById("answer").focus();
     }
 
     function checkAnswer() {
       const userAnswer = document.getElementById("answer").value.trim();
-      let correct = false;
+      let correctAnswer = showEnglish ? currentWord.ko : currentWord.en;
 
-      if (askEnglish && userAnswer.toLowerCase() === currentWord.en.toLowerCase()) {
-        correct = true;
-      } else if (!askEnglish && userAnswer === currentWord.ko) {
-        correct = true;
-      }
-
-      const resultBox = document.getElementById("result");
-      if (correct) {
-        resultBox.innerText = "정답!";
-        resultBox.style.color = "green";
+      if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+        document.getElementById("result").textContent = "✅ 정답!";
       } else {
-        resultBox.innerText = `틀렸습니다. 정답은 ${askEnglish ? currentWord.en : currentWord.ko}`;
-        resultBox.style.color = "red";
+        document.getElementById("result").textContent = "❌ 오답! 정답: " + correctAnswer;
       }
 
       setTimeout(newQuestion, 1500); // 1.5초 후 다음 문제
