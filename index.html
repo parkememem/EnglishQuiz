@@ -5,7 +5,7 @@
   <title>영어 단어 시험</title>
   <style>
     body { font-family: sans-serif; text-align: center; padding: 20px; }
-    #quiz, #result, #roundEnd { margin-top: 20px; }
+    #quiz, #roundEnd { margin-top: 20px; }
     .correct { color: green; }
     .wrong { color: red; }
     table { margin: 20px auto; border-collapse: collapse; }
@@ -83,15 +83,7 @@
     const quizDiv = document.getElementById("quiz");
     const roundEndDiv = document.getElementById("roundEnd");
 
-    function shuffle(arr) {
-      for (let i = arr.length-1; i>0; i--) {
-        const j = Math.floor(Math.random()*(i+1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    }
-
     function startRound() {
-      shuffle(pool);
       wrongList = [];
       index = 0;
       current = null;
@@ -107,11 +99,10 @@
         endRound();
         return;
       }
-      current = pool[index];
+      current = {...pool[index]};
       index++;
-      const showLang = Math.random()<0.5 ? "en":"ko";
-      current.showLang = showLang;
-      q.innerHTML = (showLang==="en") ? current.en : current.ko;
+      current.showLang = Math.random()<0.5 ? "en":"ko"; // 방향만 랜덤
+      q.innerHTML = (current.showLang==="en") ? current.en : current.ko;
       a.value = "";
       a.focus();
       fb.innerHTML = "";
