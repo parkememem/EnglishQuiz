@@ -5,100 +5,48 @@
   <title>영어 단어 시험</title>
   <style>
     body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f4f6f9;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 40px 20px;
-    }
-    .container {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      padding: 30px 40px;
-      width: 500px;
-      max-width: 100%;
-    }
-    h1 {
-      margin-top: 0;
-      font-size: 24px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      color: #2c3e50;
+      background: #f5f7fa;
+      padding: 20px;
     }
-    #quiz, #roundEnd {
-      margin-top: 20px;
-      text-align: center;
-    }
-    #question {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #34495e;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      margin-bottom: 15px;
-    }
+    h1 { color: #333; }
+    #quiz, #roundEnd { margin-top: 20px; }
+    .correct { color: green; font-weight: bold; }
+    .wrong { color: red; font-weight: bold; }
+    table { margin: 20px auto; border-collapse: collapse; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; }
+    th { background: #e0e0e0; }
     button {
-      padding: 12px 20px;
+      margin-top: 15px;
+      padding: 10px 20px;
       font-size: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       border: none;
-      background: #4CAF50;
-      color: #fff;
+      background: #007BFF;
+      color: white;
       cursor: pointer;
-      transition: background 0.2s;
     }
-    button:hover {
-      background: #45a049;
-    }
-    .correct {
-      color: #27ae60;
-      font-weight: bold;
-    }
-    .wrong {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid #ddd;
+    button:hover { background: #0056b3; }
+    input[type="text"] {
       padding: 8px 10px;
-      text-align: center;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    .feedback {
-      height: 24px;
-      margin-top: 10px;
       font-size: 16px;
+      width: 250px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
+    #feedback { margin-top: 10px; min-height: 24px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>영어 단어 시험</h1>
-    <div id="quiz">
-      <div id="question"></div>
-      <input type="text" id="answer" autocomplete="off">
-      <button onclick="checkAnswer()">확인</button>
-      <div id="feedback" class="feedback"></div>
-    </div>
-    <div id="roundEnd" style="display:none;"></div>
+  <h1>영어 단어 시험</h1>
+  <div id="quiz">
+    <div id="question"></div>
+    <input type="text" id="answer" autocomplete="off">
+    <button id="checkBtn">확인</button>
+    <div id="feedback"></div>
   </div>
+  <div id="roundEnd" style="display:none;"></div>
 
   <script>
     const wordList = [
@@ -153,13 +101,14 @@
     let wrongList = [];
     let current = null;
     let index = 0;
-    let locked = false; // 엔터 연타 방지용
+    let answering = false; // 연타 방지
 
     const q = document.getElementById("question");
     const a = document.getElementById("answer");
     const fb = document.getElementById("feedback");
     const quizDiv = document.getElementById("quiz");
     const roundEndDiv = document.getElementById("roundEnd");
+    const checkBtn = document.getElementById("checkBtn");
 
     function startRound() {
       wrongList = [];
@@ -167,33 +116,36 @@
       current = null;
       quizDiv.style.display = "block";
       roundEndDiv.style.display = "none";
+      a.value = "";
       fb.innerHTML = "";
       nextQuestion();
     }
 
     function nextQuestion() {
-      locked = false; // 새 문제에서는 입력 가능
+      answering = false;
       if (index >= pool.length) {
         endRound();
         return;
       }
       current = {...pool[index]};
       index++;
-      current.showLang = Math.random()<0.5 ? "en":"ko";
-      q.innerHTML = (current.showLang==="en") ? current.en : current.ko;
+      current.showLang = Math.random() < 0.5 ? "en" : "ko";
+      q.innerHTML = current.showLang === "en" ? current.en : current.ko;
       a.value = "";
       a.focus();
       fb.innerHTML = "";
     }
 
     function checkAnswer() {
-      if (locked || !current) return;
-      locked = true;
-
+      if (answering) return; // 연타 방지
+      answering = true;
+      if (!current) return;
       const user = a.value.trim().toLowerCase();
       let correct = false;
 
-      if (current.showLang==="en") {
+      if (user === "") {
+        correct = false;
+      } else if (current.showLang === "en") {
         correct = current.ko.toLowerCase().includes(user);
       } else {
         correct = current.en.toLowerCase() === user;
@@ -201,11 +153,11 @@
 
       if (correct) {
         fb.innerHTML = '<span class="correct">맞았습니다!</span>';
-        setTimeout(nextQuestion, 800);
+        setTimeout(nextQuestion, 500);
       } else {
-        fb.innerHTML = `<span class="wrong">틀렸습니다. 정답: ${current.showLang==="en"?current.ko:current.en}</span>`;
+        fb.innerHTML = `<span class="wrong">틀렸습니다.</span> 정답: ${current.showLang === "en" ? current.ko : current.en}`;
         wrongList.push(current);
-        setTimeout(nextQuestion, 1200);
+        setTimeout(nextQuestion, 1000);
       }
     }
 
@@ -213,28 +165,28 @@
       quizDiv.style.display = "none";
       roundEndDiv.style.display = "block";
 
-      if (wrongList.length===0) {
+      if (wrongList.length === 0) {
         roundEndDiv.innerHTML = `<h2>${currentRound}라운드 종료</h2>
-          <p>축하합니다! 모든 단어를 맞췄습니다 🎉</p>`;
+        <p>축하합니다! 모든 단어를 맞췄습니다.</p>`;
         return;
       }
 
-      if (currentRound>=5) {
+      if (currentRound >= 5) {
         roundEndDiv.innerHTML = `<h2>${currentRound}라운드 종료</h2>
-          <p>5라운드까지 끝났습니다. 최종 오답 리스트:</p>
-          ${makeWrongTable(wrongList)}`;
+        <p>5라운드까지 끝났습니다. 최종 오답 리스트:</p>
+        ${makeWrongTable(wrongList)}`;
         return;
       }
 
       roundEndDiv.innerHTML = `<h2>${currentRound}라운드 종료</h2>
-        <p>틀린 단어 목록:</p>
-        ${makeWrongTable(wrongList)}
-        <button onclick="nextRound()">다음 라운드 시작</button>`;
+      <p>틀린 단어 목록:</p>
+      ${makeWrongTable(wrongList)}
+      <button onclick="nextRound()">다음 라운드 시작</button>`;
     }
 
     function makeWrongTable(list) {
       let html = "<table><tr><th>영어</th><th>한국어</th></tr>";
-      list.forEach(w=>{
+      list.forEach(w => {
         html += `<tr><td>${w.en}</td><td>${w.ko}</td></tr>`;
       });
       html += "</table>";
@@ -247,9 +199,8 @@
       startRound();
     }
 
-    document.addEventListener("keydown", e=>{
-      if (e.key==="Enter") checkAnswer();
-    });
+    checkBtn.addEventListener("click", checkAnswer);
+    document.addEventListener("keydown", e => { if (e.key === "Enter") checkAnswer(); });
 
     startRound();
   </script>
