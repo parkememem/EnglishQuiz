@@ -4,45 +4,119 @@
   <meta charset="UTF-8">
   <title>영어 단어 시험</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Nunito', sans-serif;
       text-align: center;
-      background: #f5f7fa;
-      padding: 20px;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 40px 20px;
+      color: #fff;
     }
-    h1 { color: #333; }
-    #quiz, #roundEnd { margin-top: 20px; }
-    .correct { color: green; font-weight: bold; }
-    .wrong { color: red; font-weight: bold; }
-    table { margin: 20px auto; border-collapse: collapse; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    th, td { border: 1px solid #ccc; padding: 8px 12px; }
-    th { background: #e0e0e0; }
+
+    h1 {
+      font-weight: 700;
+      font-size: 2.2em;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    #quiz, #roundEnd {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 30px 40px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px 15px;
+      font-size: 1em;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      margin-top: 15px;
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+      backdrop-filter: blur(5px);
+      box-shadow: inset 0 4px 8px rgba(255,255,255,0.2);
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.7);
+    }
+
     button {
       margin-top: 15px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 6px;
+      padding: 10px 25px;
+      font-size: 1em;
+      border-radius: 12px;
       border: none;
-      background: #007BFF;
-      color: white;
       cursor: pointer;
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-    button:hover { background: #0056b3; }
-    input[type="text"] {
-      padding: 8px 10px;
-      font-size: 16px;
-      width: 250px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+
+    button:hover {
+      background: rgba(255,255,255,0.35);
+      transform: translateY(-2px);
     }
-    #feedback { margin-top: 10px; min-height: 24px; }
+
+    #feedback {
+      margin-top: 15px;
+      min-height: 24px;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .correct { color: #0f0; }
+    .wrong { color: #ff5555; }
+
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 400px;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 10px 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    th {
+      background: rgba(255,255,255,0.25);
+    }
+
+    td:last-child {
+      text-align: left;
+    }
   </style>
 </head>
 <body>
   <h1>영어 단어 시험</h1>
   <div id="quiz">
     <div id="question"></div>
-    <input type="text" id="answer" autocomplete="off">
+    <input type="text" id="answer" autocomplete="off" placeholder="정답을 입력하세요">
     <button id="checkBtn">확인</button>
     <div id="feedback"></div>
   </div>
@@ -101,7 +175,7 @@
     let wrongList = [];
     let current = null;
     let index = 0;
-    let answering = false; // 연타 방지
+    let answering = false;
 
     const q = document.getElementById("question");
     const a = document.getElementById("answer");
@@ -137,9 +211,10 @@
     }
 
     function checkAnswer() {
-      if (answering) return; // 연타 방지
+      if (answering) return;
       answering = true;
       if (!current) return;
+
       const user = a.value.trim().toLowerCase();
       let correct = false;
 
