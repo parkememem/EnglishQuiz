@@ -2,172 +2,180 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>English Word Quiz</title>
+  <title>영어 단어 시험</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 40px; background: #f9f9f9; }
-    #quiz-box { margin-top: 40px; }
-    #question { font-size: 24px; margin-bottom: 20px; }
-    #result { margin-top: 20px; font-size: 18px; }
-    .correct { color: green; font-weight: bold; }
-    .wrong { color: red; font-weight: bold; }
-    .small { font-size: 14px; color: #555; }
-    #stats { margin-top: 30px; font-size: 16px; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    #quiz, #result, #roundEnd { margin-top: 20px; }
+    .correct { color: green; }
+    .wrong { color: red; }
+    table { margin: 20px auto; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 5px 10px; }
+    button { margin-top: 15px; padding: 10px 20px; font-size: 16px; }
   </style>
 </head>
 <body>
-  <h1>English Word Quiz</h1>
-  <div id="quiz-box">
+  <h1>영어 단어 시험</h1>
+  <div id="quiz">
     <div id="question"></div>
-    <input type="text" id="answer">
+    <input type="text" id="answer" autocomplete="off">
     <button onclick="checkAnswer()">확인</button>
-    <div id="result"></div>
-    <div id="stats"></div>
+    <div id="feedback"></div>
   </div>
+  <div id="roundEnd" style="display:none;"></div>
 
   <script>
-    // 단어 목록
-    const words = [
-      { en: "declare", ko: "선언하다" },
-      { en: "recognition", ko: "알아봄, 인식" },
-      { en: "commitment", ko: "약속, 전념" },
-      { en: "ease", ko: "쉬움, 용이함, 편의성" },
-      { en: "domestic", ko: "국내의" },
-      { en: "tension", ko: "긴장 상태" },
-      { en: "concern", ko: "영향을 미치다, 관련되다, 배려, 염려" },
-      { en: "humanitarian", ko: "인도주의적인" },
-      { en: "crisis", ko: "위기" },
-      { en: "conference", ko: "회의" },
-      { en: "condemned", ko: "비난받은, 유죄 선고를 받은" },
-      { en: "lasting", ko: "영속적인" },
-      { en: "settlement", ko: "합의" },
-      { en: "occupation", ko: "직업" },
-      { en: "absurd", ko: "우스꽝스러운, 터무니없는" },
-      { en: "insist", ko: "고집하다" },
-      { en: "senior", ko: "고위" },
-      { en: "further", ko: "더 멀리에" },
-      { en: "sanction", ko: "제재" },
-      { en: "elected", ko: "선출된" },
-      { en: "criticism", ko: "비판" },
-      { en: "response", ko: "대답, 응답, 회신, 답장" },
-      { en: "expected", ko: "예상되는" },
-      { en: "annual", ko: "매년의" },
-      { en: "prime minister", ko: "수상" },
-      { en: "secure", ko: "안심하는" },
-      { en: "alongside", ko: "옆에, 나란히" },
-      { en: "a viable", ko: "가능한" },
-      { en: "neither", ko: "도 마찬가지이다" },
-      { en: "attempt", ko: "시도, 시도하다" },
-      { en: "brutal", ko: "잔혹한, 악랄한" },
-      { en: "genuine", ko: "진짜의, 진품의" },
-      { en: "exact", ko: "정확한" },
-      { en: "opposite", ko: "다른 편" },
-      { en: "concluded", ko: "결론을 내리다" },
-      { en: "relentless", ko: "수그러들지 않는" },
-      { en: "increasing", ko: "증가하는" },
-      { en: "bombardment", ko: "포격" },
-      { en: "offensive", ko: "모욕적인" },
-      { en: "starvation", ko: "기아, 굶주림" },
-      { en: "devastation", ko: "대대적인 파괴" },
-      { en: "utterly", ko: "완전히" },
-      { en: "intolerable", ko: "견딜 수 없는" },
-      { en: "horrify", ko: "몸서리치게 만들다" }
+    const wordList = [
+      {en:"declare", ko:"선언하다"},
+      {en:"recognition", ko:"알아봄, 인식"},
+      {en:"commitment", ko:"약속, 전념"},
+      {en:"ease", ko:"쉬움, 용이함, 편의성"},
+      {en:"domestic", ko:"국내의"},
+      {en:"tension", ko:"긴장 상태"},
+      {en:"concern", ko:"(사람에게) 영향을 미치다[관련되다], 배려, 염려"},
+      {en:"humanitarian", ko:"인도주의적인"},
+      {en:"crisis", ko:"위기"},
+      {en:"conference", ko:"회의"},
+      {en:"condemned", ko:"비난받은, 유죄 선고를 받은"},
+      {en:"lasting", ko:"영속적인"},
+      {en:"settlement", ko:"합의"},
+      {en:"occupation", ko:"직업"},
+      {en:"absurd", ko:"우스꽝스러운, 터무니없는"},
+      {en:"insist", ko:"고집하다"},
+      {en:"senior", ko:"고위"},
+      {en:"further", ko:"더 멀리에"},
+      {en:"sanction", ko:"제재"},
+      {en:"elected", ko:"선출된"},
+      {en:"criticism", ko:"비판"},
+      {en:"response", ko:"대답, 응답, 회신, 답장"},
+      {en:"expected", ko:"예상되는"},
+      {en:"annual", ko:"매년의"},
+      {en:"prime minister", ko:"수상"},
+      {en:"secure", ko:"안심하는"},
+      {en:"alongside", ko:"옆에, 나란히"},
+      {en:"a viable", ko:"가능한"},
+      {en:"neither", ko:"도 마찬가지이다"},
+      {en:"attempt", ko:"시도, 시도하다"},
+      {en:"brutal", ko:"잔혹한, 악랄한"},
+      {en:"genuine", ko:"진짜의, 진품의"},
+      {en:"exact", ko:"정확한"},
+      {en:"opposite", ko:"다른 편"},
+      {en:"concluded", ko:"결론[판단]을 내리다"},
+      {en:"relentless", ko:"수그러들지 않는"},
+      {en:"increasing", ko:"증대[증가]하는"},
+      {en:"bombardment", ko:"포격"},
+      {en:"offensive", ko:"모욕적인"},
+      {en:"starvation", ko:"기아, 굶주림"},
+      {en:"devastation", ko:"대대적인 파괴"},
+      {en:"utterly", ko:"완전히"},
+      {en:"intolerable", ko:"견딜[참을] 수 없는"},
+      {en:"horrify", ko:"몸서리치게[소름끼치게] 만들다"}
     ];
 
-    let queue = [...words];       // 현재 출제할 단어 리스트
-    let wrongList = [];           // 틀린 단어 임시 저장
+    let currentRound = 1;
+    let pool = [...wordList];
+    let wrongList = [];
     let current = null;
-    let stats = { total: 0, correct: 0, wrong: 0, round: 1 };
+    let index = 0;
 
-    const qElem = document.getElementById("question");
-    const answerInput = document.getElementById("answer");
-    const resultArea = document.getElementById("result");
-    const statsArea = document.getElementById("stats");
+    const q = document.getElementById("question");
+    const a = document.getElementById("answer");
+    const fb = document.getElementById("feedback");
+    const quizDiv = document.getElementById("quiz");
+    const roundEndDiv = document.getElementById("roundEnd");
 
-    function updateStatsDisplay() {
-      statsArea.textContent = `Round ${stats.round} | 총 ${stats.total}문제 / 정답 ${stats.correct} / 오답 ${stats.wrong}`;
+    function shuffle(arr) {
+      for (let i = arr.length-1; i>0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
     }
 
-    function normalizeAnswer(str) {
-      return str.trim().toLowerCase();
-    }
-
-    function acceptedAnswersFrom(str) {
-      return str.split(/[,\[\]]/).map(s => normalizeAnswer(s)).filter(Boolean);
-    }
-
-    function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, m => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-      }[m]));
+    function startRound() {
+      shuffle(pool);
+      wrongList = [];
+      index = 0;
+      current = null;
+      quizDiv.style.display = "block";
+      roundEndDiv.style.display = "none";
+      a.value = "";
+      fb.innerHTML = "";
+      nextQuestion();
     }
 
     function nextQuestion() {
-      if (queue.length === 0) {
-        if (wrongList.length > 0) {
-          // 오답만 모아서 새로운 라운드
-          queue = [...wrongList];
-          wrongList = [];
-          stats.round++;
-          resultArea.innerHTML = `<span class="wrong">오답 복습 라운드 시작!</span>`;
-          setTimeout(nextQuestion, 1000);
-          return;
-        } else {
-          // 모두 맞음
-          qElem.textContent = "🎉 모든 단어를 맞췄습니다!";
-          resultArea.textContent = "";
-          return;
-        }
+      if (index >= pool.length) {
+        endRound();
+        return;
       }
-
-      const idx = Math.floor(Math.random() * queue.length);
-      current = { ...queue[idx], showLang: Math.random() < 0.5 ? "en" : "ko" };
-      queue.splice(idx, 1); // 출제한 단어 제거
-      qElem.textContent = current[current.showLang];
-      answerInput.value = "";
-      resultArea.textContent = "";
-      answerInput.focus();
+      current = pool[index];
+      index++;
+      const showLang = Math.random()<0.5 ? "en":"ko";
+      current.showLang = showLang;
+      q.innerHTML = (showLang==="en") ? current.en : current.ko;
+      a.value = "";
+      a.focus();
+      fb.innerHTML = "";
     }
 
     function checkAnswer() {
       if (!current) return;
-      const user = normalizeAnswer(answerInput.value);
-      if (!user) {
-        resultArea.innerHTML = '<span class="wrong">입력값이 비었습니다.</span>';
-        return;
-      }
-
-      let match = false;
-      if (current.showLang === "en") {
-        const opts = acceptedAnswersFrom(current.ko);
-        match = opts.some(opt => user === opt);
+      const user = a.value.trim().toLowerCase();
+      let correct = false;
+      if (current.showLang==="en") {
+        correct = current.ko.toLowerCase().includes(user);
       } else {
-        const opts = acceptedAnswersFrom(current.en);
-        match = opts.some(opt => user === opt);
+        correct = current.en.toLowerCase()===user;
       }
-
-      stats.total++;
-      if (match) {
-        stats.correct++;
-        resultArea.innerHTML = '<span class="correct">맞았습니다.</span>';
-        updateStatsDisplay();
-        setTimeout(nextQuestion, 700);
+      if (correct) {
+        fb.innerHTML = '<span class="correct">맞았습니다!</span>';
+        setTimeout(nextQuestion, 500);
       } else {
-        stats.wrong++;
-        wrongList.push(current); // 틀린 단어 저장
-        const ans = (current.showLang === "en") ? current.ko : current.en;
-        resultArea.innerHTML = '<span class="wrong">틀렸습니다.</span><div class="small">정답: ' + escapeHtml(ans) + '</div>';
-        updateStatsDisplay();
-        setTimeout(nextQuestion, 1200);
+        fb.innerHTML = '<span class="wrong">틀렸습니다.</span>';
+        wrongList.push(current);
+        setTimeout(nextQuestion, 1000);
       }
     }
 
-    // Enter 키 입력 처리
-    answerInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") checkAnswer();
+    function endRound() {
+      quizDiv.style.display = "none";
+      roundEndDiv.style.display = "block";
+      if (wrongList.length===0) {
+        roundEndDiv.innerHTML = `<h2>${currentRound}라운드 종료</h2>
+        <p>축하합니다! 모든 단어를 맞췄습니다.</p>`;
+        return;
+      }
+      if (currentRound>=5) {
+        roundEndDiv.innerHTML = `<h2>${currentRound}라운드 종료</h2>
+        <p>5라운드까지 끝났습니다. 최종 오답 리스트:</p>
+        ${makeWrongTable(wrongList)}`;
+        return;
+      }
+      roundEndDiv.innerHTML = `<h2>${currentRound}라운드 종료</h2>
+      <p>틀린 단어 목록:</p>
+      ${makeWrongTable(wrongList)}
+      <button onclick="nextRound()">다음 라운드 시작</button>`;
+    }
+
+    function makeWrongTable(list) {
+      let html = "<table><tr><th>영어</th><th>한국어</th></tr>";
+      list.forEach(w=>{
+        html += `<tr><td>${w.en}</td><td>${w.ko}</td></tr>`;
+      });
+      html += "</table>";
+      return html;
+    }
+
+    function nextRound() {
+      currentRound++;
+      pool = [...wrongList];
+      startRound();
+    }
+
+    document.addEventListener("keydown", e=>{
+      if (e.key==="Enter") checkAnswer();
     });
 
-    updateStatsDisplay();
-    nextQuestion();
+    startRound();
   </script>
 </body>
 </html>
