@@ -73,8 +73,10 @@
       { en: "horrify", ko: "몸서리치게 만들다" }
     ];
 
+    let queue = [...words];       // 현재 출제할 단어 리스트
+    let wrongList = [];           // 틀린 단어 임시 저장
     let current = null;
-    let stats = { total: 0, correct: 0, wrong: 0 };
+    let stats = { total: 0, correct: 0, wrong: 0, round: 1 };
 
     const qElem = document.getElementById("question");
     const answerInput = document.getElementById("answer");
@@ -82,7 +84,7 @@
     const statsArea = document.getElementById("stats");
 
     function updateStatsDisplay() {
-      statsArea.textContent = `총 ${stats.total}문제 / 정답 ${stats.correct} / 오답 ${stats.wrong}`;
+      statsArea.textContent = `Round ${stats.round} | 총 ${stats.total}문제 / 정답 ${stats.correct} / 오답 ${stats.wrong}`;
     }
 
     function normalizeAnswer(str) {
@@ -100,10 +102,27 @@
     }
 
     function nextQuestion() {
-      const idx = Math.floor(Math.random() * words.length);
-      const showLang = Math.random() < 0.5 ? "en" : "ko";
-      current = { ...words[idx], showLang };
-      qElem.textContent = current[showLang];
+      if (queue.length === 0) {
+        if (wrongList.length > 0) {
+          // 오답만 모아서 새로운 라운드
+          queue = [...wrongList];
+          wrongList = [];
+          stats.round++;
+          resultArea.innerHTML = `<span class="wrong">오답 복습 라운드 시작!</span>`;
+          setTimeout(nextQuestion, 1000);
+          return;
+        } else {
+          // 모두 맞음
+          qElem.textContent = "🎉 모든 단어를 맞췄습니다!";
+          resultArea.textContent = "";
+          return;
+        }
+      }
+
+      const idx = Math.floor(Math.random() * queue.length);
+      current = { ...queue[idx], showLang: Math.random() < 0.5 ? "en" : "ko" };
+      queue.splice(idx, 1); // 출제한 단어 제거
+      qElem.textContent = current[current.showLang];
       answerInput.value = "";
       resultArea.textContent = "";
       answerInput.focus();
@@ -119,11 +138,9 @@
 
       let match = false;
       if (current.showLang === "en") {
-        // 한국어 답 요구
         const opts = acceptedAnswersFrom(current.ko);
         match = opts.some(opt => user === opt);
       } else {
-        // 영어 답 요구
         const opts = acceptedAnswersFrom(current.en);
         match = opts.some(opt => user === opt);
       }
@@ -133,21 +150,20 @@
         stats.correct++;
         resultArea.innerHTML = '<span class="correct">맞았습니다.</span>';
         updateStatsDisplay();
-        setTimeout(() => { nextQuestion(); }, 800); // 맞으면 0.8초 후 자동 다음
+        setTimeout(nextQuestion, 700);
       } else {
         stats.wrong++;
+        wrongList.push(current); // 틀린 단어 저장
         const ans = (current.showLang === "en") ? current.ko : current.en;
-        resultArea.innerHTML = '<span class="wrong">틀렸습니다.</span><div class="small">정답 예시: ' + escapeHtml(ans) + '</div>';
+        resultArea.innerHTML = '<span class="wrong">틀렸습니다.</span><div class="small">정답: ' + escapeHtml(ans) + '</div>';
         updateStatsDisplay();
-        // 틀리면 넘어가지 않고 그대로 유지
+        setTimeout(nextQuestion, 1200);
       }
     }
 
     // Enter 키 입력 처리
     answerInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        checkAnswer();
-      }
+      if (e.key === "Enter") checkAnswer();
     });
 
     updateStatsDisplay();
